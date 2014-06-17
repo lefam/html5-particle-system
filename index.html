@@ -1,0 +1,103 @@
+<html>
+<head>
+  <title>First HTML5 Particle System</title>
+
+  <style type="text/css">
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+  
+  <script type="text/javascript" src="lib/Stats.js"></script>
+  <script type="text/javascript" src="lib/dat.gui.min.js"></script>
+  <script type="text/javascript" src="js/vector2d.js"></script>
+  <script type="text/javascript" src="js/color.js"></script>
+  <script type="text/javascript" src="js/particles.js"></script>
+
+  <script type="text/javascript">
+    // Frames per second.
+    FPS = 60;
+    
+    // Milliseconds per frame.
+    FRAME_MS = 1000 / FPS;
+  
+    var canvas, ctx;
+    var ps, pparams;
+    var stats, gui;
+
+    pparams = new ParticleParameters();
+
+    window.onload = function() {
+      canvas = document.getElementById("canvas");
+      if( canvas && canvas.getContext ) {
+        ctx = canvas.getContext("2d");
+        init();
+
+        canvas.onmousemove = function(e) {
+          if( !e ) e = window.event;
+          pparams.emitter.x = e.clientX;
+          pparams.emitter.y = e.clientY;
+        }
+        
+        setInterval(loop, FRAME_MS);
+      }
+    }
+
+    window.onresize = function() {
+      if( canvas ) {
+        canvas.width  = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+    }
+
+    function init() {
+      pparams.emitter = new Vector2D(canvas.width / 2, canvas.height / 2);
+      pparams.dispersion = 1;
+      pparams.createTime = 1;
+      pparams.maxParticles = 5000;
+      pparams.particlesPerCreation = 10;
+      pparams.accel = new Vector2D(0, 0);
+      pparams.speed = 1;
+      pparams.life = 20;
+      pparams.startSize = 10;
+      pparams.endSize = 10;
+      pparams.startColor = new Color(1, 1, 1, 1.0);
+      pparams.endColor = new Color(0.7, 0.7, 0.7, 0.1);
+
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerWidth;
+      ps = new ParticleSystem(ctx, pparams);
+
+      stats = new Stats();
+      stats.getDomElement().style.position = "absolute";
+      stats.getDomElement().style.left = "0px";
+      stats.getDomElement().style.top = "0px";
+      document.body.appendChild(stats.getDomElement());
+
+      gui = new dat.GUI();
+      gui.add(pparams, "maxParticles", 1, 5000);
+      gui.add(pparams, "particlesPerCreation", 1, 100);
+      gui.add(pparams, "startSize", 1, 30);
+      gui.add(pparams, "endSize", 1, 30);
+      gui.add(pparams, "life", 1, 70);
+      gui.add(pparams, "createTime", 1, 5);
+    }
+
+    function loop() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ps.update();
+      ps.draw();
+      stats.update();
+    }
+    
+  </script>
+</head>
+<body>
+  <canvas id="canvas" width="500" height="400">
+    Your browser does not support the HTML5 canvas element!
+  </canvas>
+</body>
+</html>
